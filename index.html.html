@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OTC Online Room — Product Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1e2633;
+    --border: #2a3441;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --accent: #1f8ef1;
+    --accent-glow: rgba(31,142,241,0.18);
+    --green: #2ea043;
+    --green-hover: #3fb950;
+    --red: #da3633;
+    --red-hover: #f85149;
+    --warning: #d29922;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --radius: 10px;
+    --transition: 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  [data-theme="light"] {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #e8edf3;
+    --border: #d0d7de;
+    --text: #1c2128;
+    --text-muted: #57606a;
+    --accent: #0969da;
+    --accent-glow: rgba(9,105,218,0.12);
+    --green: #1a7f37;
+    --green-hover: #2da44e;
+    --red: #cf222e;
+    --red-hover: #a40e26;
+    --warning: #9a6700;
+    --card-shadow: 0 2px 16px rgba(0,0,0,0.09);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.2);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    width: 52px; height: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    position: relative;
+    transition: background var(--transition);
+    outline: none;
+  }
+  .theme-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    transition: transform var(--transition);
+  }
+  [data-theme="light"] .theme-toggle::after { transform: translateX(24px); }
+  .theme-label { font-size: 12px; color: var(--text-muted); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+  .btn:hover::after { opacity: 1; }
+  .btn:active { transform: scale(0.96); }
+
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 0 0 0 var(--accent-glow); }
+  .btn-primary:hover { box-shadow: 0 0 0 4px var(--accent-glow); transform: translateY(-1px); }
+
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { background: var(--green-hover); transform: translateY(-1px); }
+
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: var(--red-hover); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  .btn-sm { padding: 5px 11px; font-size: 12px; border-radius: 6px; }
+
+  /* ── MAIN ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+
+  /* ── DASHBOARD CARDS ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition);
+    animation: fadeUp 0.4s ease both;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .card-icon.blue { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(31,142,241,0.25); }
+  .card-icon.orange { background: rgba(210,153,34,0.15); color: var(--warning); border: 1px solid rgba(210,153,34,0.25); }
+  .card-icon.green { background: rgba(46,160,67,0.15); color: var(--green); border: 1px solid rgba(46,160,67,0.25); }
+  .card-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .card-value { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    animation: fadeUp 0.4s 0.2s ease both;
+    margin-bottom: 20px;
+  }
+  .panel-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .panel-title { font-size: 15px; font-weight: 700; }
+
+  /* ── ADD PRODUCT FORM ── */
+  .add-form { padding: 18px 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+  .form-group label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .form-group input::placeholder { color: var(--text-muted); }
+  .form-add-btn { align-self: flex-end; padding-bottom: 1px; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px 9px 36px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 14px; pointer-events: none;
+  }
+  .low-stock-filter { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: var(--text-muted); }
+  .low-stock-filter input { accent-color: var(--warning); cursor: pointer; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 12px 22px;
+    text-align: left;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-icon { margin-left: 4px; opacity: 0.4; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.low-stock td:nth-child(3) .qty-badge { background: rgba(210,153,34,0.2); color: var(--warning); border-color: rgba(210,153,34,0.3); }
+  tbody td { padding: 13px 22px; font-size: 13px; vertical-align: middle; }
+  .sku-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .product-name { font-weight: 500; }
+  .qty-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 52px; padding: 3px 10px;
+    background: rgba(31,142,241,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(31,142,241,0.25);
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+  }
+  .actions-cell { display: flex; gap: 6px; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--transition);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 30px;
+    width: 420px; max-width: 95vw;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    transform: scale(0.92) translateY(10px);
+    transition: transform var(--transition);
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-close {
+    width: 30px; height: 30px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all var(--transition);
+  }
+  .modal-close:hover { color: var(--text); border-color: var(--text-muted); }
+  .modal-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+  .modal-field label { display: block; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .modal-field input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 13px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .modal-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── CONFIRM MODAL ── */
+  .confirm-modal .modal { width: 360px; }
+  .confirm-msg { font-size: 14px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+  .confirm-msg strong { color: var(--text); }
+
+  /* ── TOAST ── */
+  #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 16px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: toastIn 0.3s ease both;
+    min-width: 240px;
+  }
+  .toast.out { animation: toastOut 0.3s ease both; }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .toast.success .toast-dot { background: var(--green); }
+  .toast.error .toast-dot { background: var(--red); }
+  .toast.info .toast-dot { background: var(--accent); }
+  .toast.warning .toast-dot { background: var(--warning); }
+
+  /* ── LOW STOCK THRESHOLD ── */
+  .threshold-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .threshold-wrap input {
+    width: 56px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    outline: none;
+    text-align: center;
+    transition: border-color var(--transition);
+  }
+  .threshold-wrap input:focus { border-color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(20px); }
+  }
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .row-new { animation: rowIn 0.3s ease both; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    header { padding: 0 16px; }
+    main { padding: 16px 12px; }
+    .logo-text { font-size: 13px; }
+    .logo-sub { display: none; }
+    .add-form { flex-direction: column; }
+    .form-add-btn { align-self: stretch; }
+    .panel-header { flex-direction: column; align-items: flex-start; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .search-wrap { min-width: auto; }
+    thead th:nth-child(1), tbody td:nth-child(1) { display: none; }
+    .header-actions .theme-label { display: none; }
+  }
+  @media (max-width: 480px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .card-value { font-size: 22px; }
+  }
+
+  /* ── GOOGLE SHEETS PANEL ── */
+  .gs-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    animation: fadeUp 0.4s 0.15s ease both;
+  }
+  .gs-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .gs-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .gs-status-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--text-muted);
+    display: inline-block;
+    transition: background 0.3s;
+  }
+  .gs-status-dot.connected { background: var(--green); box-shadow: 0 0 6px rgba(46,160,67,0.5); }
+  .gs-status-dot.syncing { background: var(--warning); box-shadow: 0 0 6px rgba(210,153,34,0.5); animation: pulse 1s infinite; }
+  .gs-status-dot.error { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .gs-status-text { font-size: 12px; color: var(--text-muted); }
+  .gs-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .gs-url-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .gs-url-group { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 6px; }
+  .gs-url-group label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .gs-url-group input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    width: 100%;
+  }
+  .gs-url-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .gs-url-group input::placeholder { color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+  .gs-info {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .gs-info ol { padding-left: 18px; }
+  .gs-info li { margin-bottom: 4px; }
+  .gs-info code {
+    background: rgba(31,142,241,0.12);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .gs-last-sync { font-size: 11px; color: var(--text-muted); font-style: italic; }
+  .gs-script-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .gs-script-box-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+  }
+  .gs-script-content {
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .gs-script-content.open { max-height: 600px; overflow-x: auto; overflow-y: auto; }
+  .gs-toggle-script { background: none; border: none; color: var(--accent); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+  .gs-toggle-script:hover { text-decoration: underline; }
+
+  /* ── PAGINATION ── */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+  .page-info { font-size: 12px; color: var(--text-muted); }
+  .page-btns { display: flex; gap: 6px; }
+  .page-btn {
+    width: 30px; height: 30px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+  }
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    <div>
+      <div class="logo-text">OTC Online Room</div>
+      <div class="logo-sub">Product Management System</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="theme-label" id="themeLabel">Dark</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme" onclick="toggleTheme()"></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()" title="Export to CSV">⬇ CSV</button>
+    <button class="btn btn-ghost btn-sm" onclick="backupJSON()" title="Backup data">💾 Backup</button>
+    <label class="btn btn-ghost btn-sm" title="Restore from backup" style="cursor:pointer">
+      📂 Restore <input type="file" accept=".json" id="restoreInput" style="display:none" onchange="restoreJSON(event)"/>
+    </label>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon blue">📦</div>
+      <div>
+        <div class="card-label">Total Products</div>
+        <div class="card-value" id="statTotal">0</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">⚠️</div>
+      <div>
+        <div class="card-label">Low Stock</div>
+        <div class="card-value" id="statLow">0</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon green">✅</div>
+      <div>
+        <div class="card-label">Total Units</div>
+        <div class="card-value" id="statUnits">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE SHEETS PANEL -->
+  <div class="gs-panel">
+    <div class="gs-header">
+      <div class="gs-title">
+        <span>🟢</span> Google Sheets Sync
+        <span class="gs-status-dot" id="gsStatusDot"></span>
+        <span class="gs-status-text" id="gsStatusText">Not connected</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="gs-last-sync" id="gsLastSync"></span>
+        <button class="btn btn-ghost btn-sm" onclick="syncNow()" id="gsSyncBtn" title="Push all products to sheet now">⟳ Sync Now</button>
+      </div>
+    </div>
+    <div class="gs-body">
+      <div class="gs-url-row">
+        <div class="gs-url-group">
+          <label>Google Apps Script Web App URL</label>
+          <input type="text" id="gsWebAppUrl" placeholder="Paste your Web App URL here — https://script.google.com/macros/s/..." oninput="onUrlChange()"/>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveGsUrl()" style="white-space:nowrap;align-self:flex-end">💾 Save URL</button>
+        <button class="btn btn-ghost btn-sm" onclick="disconnectGs()" style="white-space:nowrap;align-self:flex-end">✕ Disconnect</button>
+      </div>
+
+      <div class="gs-script-box">
+        <div class="gs-script-box-header">
+          <span>📋 Google Apps Script — paste this into your script editor</span>
+          <div style="display:flex;gap:8px">
+            <button class="gs-toggle-script" onclick="toggleScript()">▼ Show script</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyScript()">⎘ Copy</button>
+          </div>
+        </div>
+        <div class="gs-script-content" id="gsScriptContent">// ═══════════════════════════════════════════
+// OTC Online Room — Google Sheets Sync Script
+// ═══════════════════════════════════════════
+
+var NAVY       = "#1A2B4A";
+var ACCENT     = "#2563EB";
+var WHITE      = "#FFFFFF";
+var LIGHT_BLUE = "#EFF6FF";
+var HEADER_BG  = "#DBEAFE";
+var ROW_ALT    = "#F8FAFC";
+var BORDER     = "#CBD5E1";
+var GREEN      = "#16A34A";  var GREEN_BG  = "#F0FDF4";
+var AMBER      = "#D97706";  var AMBER_BG  = "#FFFBEB";
+var RED        = "#DC2626";  var RED_BG    = "#FEF2F2";
+var GRAY       = "#475569";
+var TOTAL_BG   = "#EFF6FF";
+
+function doPost(e) {
+  try {
+    var raw = (e.postData && e.postData.contents)
+              ? e.postData.contents
+              : (e.parameter && e.parameter.payload ? e.parameter.payload : null);
+    if (!raw) return jsonOut({ status: "error", message: "No data received" });
+    var data = JSON.parse(raw);
+    if (data.action === "sync_all") return syncAll(data.products);
+    return jsonOut({ status: "unknown_action" });
+  } catch(err) {
+    return jsonOut({ status: "error", message: err.message });
+  }
+}
+
+function doGet(e) {
+  if (e && e.parameter && e.parameter.payload) {
+    try {
+      var data = JSON.parse(e.parameter.payload);
+      if (data.action === "sync_all") return syncAll(data.products);
+    } catch(err) {
+      return jsonOut({ status: "error", message: err.message });
+    }
+  }
+  return jsonOut({ status: "ok", message: "OTC Sync endpoint active" });
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function syncAll(products) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // ── Remove old sheet if exists, create fresh ──
+  var old = ss.getSheetByName("OTC Products");
+  if (old) ss.deleteSheet(old);
+  var sh = ss.insertSheet("OTC Products");
+  ss.setActiveSheet(sh);
+
+  var now      = new Date();
+  var dateStr  = Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), "dd MMM yyyy, HH:mm");
+  var total    = products.length;
+  var inStock  = products.filter(function(p){ return p.qty > 0; }).length;
+  var outStock = products.filter(function(p){ return p.qty === 0; }).length;
+  var units    = products.reduce(function(a,p){ return a + p.qty; }, 0);
+
+  // ════════════════════════════════
+  // ROW 1 — Main Title
+  // ════════════════════════════════
+  sh.getRange("A1:E1").merge()
+    .setValue("OTC Online Room — Product Inventory")
+    .setFontFamily("Arial").setFontSize(18).setFontWeight("bold")
+    .setFontColor(NAVY).setBackground(WHITE)
+    .setVerticalAlignment("middle").setHorizontalAlignment("left");
+  sh.setRowHeight(1, 42);
+
+  // ROW 2 — Subtitle / date
+  sh.getRange("A2:E2").merge()
+    .setValue("Generated: " + dateStr + "     |     Total Products: " + total)
+    .setFontFamily("Arial").setFontSize(10).setFontColor(GRAY)
+    .setBackground(WHITE).setHorizontalAlignment("left")
+    .setVerticalAlignment("middle");
+  sh.setRowHeight(2, 22);
+
+  // ROW 3 — thin accent line (simulated with bg)
+  sh.getRange("A3:E3").merge().setBackground(ACCENT);
+  sh.setRowHeight(3, 3);
+
+  // ROW 4 — spacer
+  sh.getRange("A4:E4").merge().setBackground(WHITE);
+  sh.setRowHeight(4, 8);
+
+  // ════════════════════════════════
+  // ROWS 5-6 — Summary Cards
+  // ════════════════════════════════
+  var cards = [
+    { col: "A", label: "Total Products", value: total,    bg: "#EFF6FF", fg: "#2563EB", border: "#BFDBFE" },
+    { col: "B", label: "In Stock",       value: inStock,  bg: "#F0FDF4", fg: "#16A34A", border: "#BBF7D0" },
+    { col: "C", label: "Out of Stock",   value: outStock, bg: "#FEF2F2", fg: "#DC2626", border: "#FECACA" },
+    { col: "D", label: "Total Units",    value: units,    bg: "#EFF6FF", fg: "#1A2B4A", border: "#BFDBFE" },
+  ];
+
+  cards.forEach(function(c) {
+    sh.getRange(c.col + "5").setValue(c.label)
+      .setFontFamily("Arial").setFontSize(9).setFontColor(GRAY)
+      .setBackground(c.bg).setHorizontalAlignment("center")
+      .setVerticalAlignment("bottom").setFontWeight("normal");
+    sh.getRange(c.col + "6").setValue(c.value)
+      .setFontFamily("Arial").setFontSize(20).setFontWeight("bold")
+      .setFontColor(c.fg).setBackground(c.bg)
+      .setHorizontalAlignment("center").setVerticalAlignment("top");
+  });
+  sh.setRowHeight(5, 20);
+  sh.setRowHeight(6, 30);
+
+  // ROW 7 — spacer
+  sh.getRange("A7:E7").merge().setBackground(WHITE);
+  sh.setRowHeight(7, 10);
+
+  // ════════════════════════════════
+  // ROW 8 — Table Header
+  // ════════════════════════════════
+  var headers = ["SKU", "Product Name", "Quantity", "Status", "Last Updated"];
+  var hRow = sh.getRange("A8:E8");
+  hRow.setValues([headers])
+    .setFontFamily("Arial").setFontSize(10).setFontWeight("bold")
+    .setFontColor(WHITE).setBackground(NAVY)
+    .setHorizontalAlignment("center").setVerticalAlignment("middle");
+  sh.getRange("B8").setHorizontalAlignment("left");
+  sh.setRowHeight(8, 26);
+
+  // ════════════════════════════════
+  // DATA ROWS — starting row 9
+  // ════════════════════════════════
+  var syncTime = Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), "dd MMM yyyy HH:mm");
+
+  for (var i = 0; i < products.length; i++) {
+    var p   = products[i];
+    var row = 9 + i;
+    var qty = p.qty;
+    var status = qty > 1 ? "In Stock" : (qty === 1 ? "Low Stock" : "Out of Stock");
+    var qtyColor    = qty > 1 ? GREEN  : (qty === 1 ? AMBER  : RED);
+    var qtyBg       = qty > 1 ? GREEN_BG : (qty === 1 ? AMBER_BG : RED_BG);
+    var statusColor = qtyColor;
+    var statusBg    = qtyBg;
+    var rowBg       = (i % 2 === 0) ? WHITE : ROW_ALT;
+
+    // SKU
+    sh.getRange(row, 1).setValue(p.sku)
+      .setFontFamily("Arial").setFontSize(9).setFontColor(GRAY)
+      .setBackground(rowBg).setHorizontalAlignment("center")
+      .setVerticalAlignment("middle");
+
+    // Product Name
+    sh.getRange(row, 2).setValue(p.name)
+      .setFontFamily("Arial").setFontSize(9.5).setFontColor("#1E293B")
+      .setBackground(rowBg).setHorizontalAlignment("left")
+      .setVerticalAlignment("middle");
+
+    // Quantity
+    sh.getRange(row, 3).setValue(qty)
+      .setFontFamily("Arial").setFontSize(11).setFontWeight("bold")
+      .setFontColor(qtyColor).setBackground(qtyBg)
+      .setHorizontalAlignment("center").setVerticalAlignment("middle");
+
+    // Status
+    sh.getRange(row, 4).setValue(status)
+      .setFontFamily("Arial").setFontSize(9).setFontWeight("bold")
+      .setFontColor(statusColor).setBackground(statusBg)
+      .setHorizontalAlignment("center").setVerticalAlignment("middle");
+
+    // Last Updated
+    sh.getRange(row, 5).setValue(syncTime)
+      .setFontFamily("Arial").setFontSize(9).setFontColor(GRAY)
+      .setBackground(rowBg).setHorizontalAlignment("center")
+      .setVerticalAlignment("middle");
+
+    sh.setRowHeight(row, 20);
+  }
+
+  // ── Grid border on data range ──
+  var dataRange = sh.getRange(8, 1, products.length + 1, 5);
+  dataRange.setBorder(true, true, true, true, true, true,
+    BORDER, SpreadsheetApp.BorderStyle.SOLID);
+
+  // ════════════════════════════════
+  // TOTALS ROW
+  // ════════════════════════════════
+  var totalRow = 9 + products.length + 1;
+  sh.getRange(totalRow, 1, 1, 2).merge()
+    .setValue("TOTAL UNITS IN STOCK")
+    .setFontFamily("Arial").setFontSize(10).setFontWeight("bold")
+    .setFontColor(NAVY).setBackground(LIGHT_BLUE)
+    .setHorizontalAlignment("right").setVerticalAlignment("middle");
+  sh.getRange(totalRow, 3)
+    .setFormula("=SUM(C9:C" + (totalRow - 2) + ")")
+    .setFontFamily("Arial").setFontSize(12).setFontWeight("bold")
+    .setFontColor(ACCENT).setBackground(LIGHT_BLUE)
+    .setHorizontalAlignment("center").setVerticalAlignment("middle");
+  sh.getRange(totalRow, 4, 1, 2).merge().setBackground(LIGHT_BLUE);
+  sh.setRowHeight(totalRow, 26);
+
+  // ── Footer ──
+  var footerRow = totalRow + 2;
+  sh.getRange(footerRow, 1, 1, 5).merge()
+    .setValue("OTC Online Room  ·  Confidential Internal Document  ·  " + dateStr)
+    .setFontFamily("Arial").setFontSize(8).setFontColor("#94A3B8")
+    .setHorizontalAlignment("center").setFontStyle("italic");
+
+  // ════════════════════════════════
+  // COLUMN WIDTHS
+  // ════════════════════════════════
+  sh.setColumnWidth(1, 110);  // SKU
+  sh.setColumnWidth(2, 360);  // Product Name
+  sh.setColumnWidth(3, 80);   // Qty
+  sh.setColumnWidth(4, 110);  // Status
+  sh.setColumnWidth(5, 150);  // Last Updated
+
+  // ── Freeze header row ──
+  sh.setFrozenRows(8);
+
+  // ── Hide gridlines for clean look ──
+  sh.setHiddenGridlines(true);
+
+  // ── Row 1 height ──
+  sh.setRowHeight(1, 46);
+
+  return jsonOut({ status: "ok", synced: products.length });
+}</div>
+      </div>
+
+      <div class="gs-info">
+        <strong style="color:var(--text)">⚡ Setup in 3 steps:</strong>
+        <ol>
+          <li>Open <a href="https://sheets.google.com" target="_blank" style="color:var(--accent)">Google Sheets</a>, create a new sheet, then go to <code>Extensions → Apps Script</code></li>
+          <li>Delete the default code, paste the script above, then click <code>Deploy → New deployment → Web App</code> — set <em>Execute as: Me</em>, <em>Who has access: Anyone</em></li>
+          <li>Copy the Web App URL, paste it above, and click <strong>Save URL</strong> — products will auto-sync on every add, edit, or delete</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">➕ Add New Product</span>
+    </div>
+    <div class="add-form">
+      <div class="form-group">
+        <label>SKU</label>
+        <input type="text" id="newSku" placeholder="e.g. SKU-001" />
+      </div>
+      <div class="form-group" style="flex:2">
+        <label>Product Name</label>
+        <input type="text" id="newName" placeholder="e.g. HDMI Cable 2m" />
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" id="newQty" placeholder="0" min="0" />
+      </div>
+      <div class="form-add-btn">
+        <button class="btn btn-primary" onclick="addProduct()">＋ Add Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT TABLE PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">📋 Product Inventory</span>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div class="threshold-wrap">
+          <span>Low stock ≤</span>
+          <input type="number" id="thresholdInput" value="5" min="0" onchange="saveThreshold()" title="Low stock threshold"/>
+          <span>units</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by SKU or product name…" oninput="renderTable()"/>
+      </div>
+      <label class="low-stock-filter">
+        <input type="checkbox" id="lowStockFilter" onchange="renderTable()"/> Show low stock only
+      </label>
+      <select id="pageSizeSelect" onchange="renderTable()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer;">
+        <option value="10">10 / page</option>
+        <option value="25">25 / page</option>
+        <option value="50">50 / page</option>
+        <option value="9999">All</option>
+      </select>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('sku')">SKU <span class="sort-icon" id="sort-sku">↕</span></th>
+            <th onclick="sortBy('name')">Product Name <span class="sort-icon" id="sort-name">↕</span></th>
+            <th onclick="sortBy('qty')">Quantity <span class="sort-icon" id="sort-qty">↕</span></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="icon">📭</div>
+        <p>No products found. Add your first product above!</p>
+      </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <div class="page-info" id="pageInfo">Showing 0 of 0 products</div>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── EDIT MODAL ── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">✏️ Edit Product</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label>SKU</label>
+        <input type="text" id="editSku" placeholder="SKU"/>
+      </div>
+      <div class="modal-field">
+        <label>Product Name</label>
+        <input type="text" id="editName" placeholder="Product Name"/>
+      </div>
+      <div class="modal-field">
+        <label>Quantity</label>
+        <input type="number" id="editQty" placeholder="0" min="0"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONFIRM DELETE MODAL ── -->
+<div class="modal-overlay confirm-modal" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🗑️ Delete Product</span>
+      <button class="modal-close" onclick="closeConfirm()">✕</button>
+    </div>
+    <div class="confirm-msg">
+      Are you sure you want to delete <strong id="confirmProductName"></strong>? This action cannot be undone.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast-container"></div>
+
+<script>
+/* ──────────────────────────────────────────────
+   GOOGLE SHEETS SYNC
+────────────────────────────────────────────── */
+let gsUrl = '';
+let gsSyncing = false;
+
+function initGs() {
+  gsUrl = localStorage.getItem('otc_gs_url') || '';
+  if (gsUrl) {
+    document.getElementById('gsWebAppUrl').value = gsUrl;
+    setGsStatus('connected', 'Connected');
+  }
+  const lastSync = localStorage.getItem('otc_gs_last_sync');
+  if (lastSync) document.getElementById('gsLastSync').textContent = 'Last sync: ' + lastSync;
+}
+
+function onUrlChange() {
+  const val = document.getElementById('gsWebAppUrl').value.trim();
+  if (!val) setGsStatus('', 'Not connected');
+}
+
+function saveGsUrl() {
+  const url = document.getElementById('gsWebAppUrl').value.trim();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    showToast('Please paste a valid Google Apps Script URL.', 'error'); return;
+  }
+  gsUrl = url;
+  localStorage.setItem('otc_gs_url', gsUrl);
+  setGsStatus('connected', 'Connected');
+  showToast('Google Sheets URL saved! Syncing now…', 'success');
+  syncToSheet();
+}
+
+function disconnectGs() {
+  gsUrl = '';
+  localStorage.removeItem('otc_gs_url');
+  localStorage.removeItem('otc_gs_last_sync');
+  document.getElementById('gsWebAppUrl').value = '';
+  document.getElementById('gsLastSync').textContent = '';
+  setGsStatus('', 'Not connected');
+  showToast('Google Sheets disconnected.', 'warning');
+}
+
+function setGsStatus(state, text) {
+  const dot = document.getElementById('gsStatusDot');
+  const txt = document.getElementById('gsStatusText');
+  dot.className = 'gs-status-dot' + (state ? ' ' + state : '');
+  txt.textContent = text;
+}
+
+function syncNow() {
+  if (!gsUrl) { showToast('No Google Sheets URL saved. Please add one above.', 'error'); return; }
+  syncToSheet();
+}
+
+async function syncToSheet() {
+  if (!gsUrl || gsSyncing) return;
+  gsSyncing = true;
+  setGsStatus('syncing', 'Syncing…');
+  document.getElementById('gsSyncBtn').disabled = true;
+
+  try {
+    // Use GET with payload in URL — Apps Script handles GET without CORS issues.
+    // We use no-cors mode so browser doesn't block it, and the script runs server-side.
+    const payload = JSON.stringify({ action: 'sync_all', products });
+    const url = gsUrl + '?payload=' + encodeURIComponent(payload);
+
+    await fetch(url, { method: 'GET', mode: 'no-cors' });
+
+    // no-cors means we can't read the response, but the script runs fine server-side.
+    const now = new Date().toLocaleString();
+    localStorage.setItem('otc_gs_last_sync', now);
+    document.getElementById('gsLastSync').textContent = 'Last sync: ' + now;
+    setGsStatus('connected', 'Connected');
+    showToast('✅ Synced ' + products.length + ' products to Google Sheets.', 'success');
+
+  } catch (err) {
+    setGsStatus('error', 'Sync failed');
+    showToast('Sync failed: ' + err.message, 'error');
+  }
+
+  gsSyncing = false;
+  document.getElementById('gsSyncBtn').disabled = false;
+}
+
+function toggleScript() {
+  const el = document.getElementById('gsScriptContent');
+  const btn = document.querySelector('.gs-toggle-script');
+  const open = el.classList.toggle('open');
+  btn.textContent = open ? '▲ Hide script' : '▼ Show script';
+}
+
+function copyScript() {
+  const text = document.getElementById('gsScriptContent').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Script copied to clipboard!', 'success'));
+}
+
+/* ──────────────────────────────────────────────
+   STATE
+────────────────────────────────────────────── */
+let products = [];
+let editingIndex = -1;
+let deleteIndex = -1;
+let sortKey = '';
+let sortDir = 1;
+let currentPage = 1;
+let threshold = 5;
+
+/* ──────────────────────────────────────────────
+   INIT
+────────────────────────────────────────────── */
+function init() {
+  const saved = localStorage.getItem('otc_products');
+  if (saved) products = JSON.parse(saved);
+  threshold = parseInt(localStorage.getItem('otc_threshold') || '5');
+  document.getElementById('thresholdInput').value = threshold;
+  const theme = localStorage.getItem('otc_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeLabel').textContent = theme === 'dark' ? 'Dark' : 'Light';
+  renderTable();
+  updateStats();
+  initGs();
+}
+
+/* ──────────────────────────────────────────────
+   SAVE
+────────────────────────────────────────────── */
+function save() {
+  localStorage.setItem('otc_products', JSON.stringify(products));
+  updateStats();
+  if (gsUrl) syncToSheet();
+}
+
+/* ──────────────────────────────────────────────
+   STATS
+────────────────────────────────────────────── */
+function updateStats() {
+  document.getElementById('statTotal').textContent = products.length;
+  const low = products.filter(p => p.qty <= threshold).length;
+  document.getElementById('statLow').textContent = low;
+  const units = products.reduce((a, p) => a + p.qty, 0);
+  document.getElementById('statUnits').textContent = units.toLocaleString();
+}
+
+/* ──────────────────────────────────────────────
+   ADD PRODUCT
+────────────────────────────────────────────── */
+function addProduct() {
+  const sku  = document.getElementById('newSku').value.trim();
+  const name = document.getElementById('newName').value.trim();
+  const qty  = parseInt(document.getElementById('newQty').value) || 0;
+  if (!sku)  { showToast('Please enter a SKU.', 'error'); return; }
+  if (!name) { showToast('Please enter a product name.', 'error'); return; }
+  if (products.some(p => p.sku.toLowerCase() === sku.toLowerCase())) {
+    showToast('SKU already exists!', 'error'); return;
+  }
+  products.unshift({ sku, name, qty });
+  save(); renderTable();
+  document.getElementById('newSku').value = '';
+  document.getElementById('newName').value = '';
+  document.getElementById('newQty').value = '';
+  document.getElementById('newSku').focus();
+  showToast(`"${name}" added successfully.`, 'success');
+}
+
+/* ──────────────────────────────────────────────
+   SORT
+────────────────────────────────────────────── */
+function sortBy(key) {
+  if (sortKey === key) { sortDir *= -1; }
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('.sort-icon').forEach(el => el.textContent = '↕');
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  const col = document.getElementById('sort-' + key);
+  if (col) { col.textContent = sortDir === 1 ? '↑' : '↓'; col.closest('th').classList.add('sorted'); }
+  currentPage = 1;
+  renderTable();
+}
+
+/* ──────────────────────────────────────────────
+   RENDER TABLE
+────────────────────────────────────────────── */
+function renderTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const lowOnly = document.getElementById('lowStockFilter').checked;
+  const pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+
+  let filtered = products.filter(p => {
+    const match = p.sku.toLowerCase().includes(q) || p.name.toLowerCase().includes(q);
+    const low = p.qty <= threshold;
+    return match && (!lowOnly || low);
+  });
+
+  if (sortKey) {
+    filtered.sort((a, b) => {
+      const av = sortKey === 'qty' ? a.qty : a[sortKey].toLowerCase();
+      const bv = sortKey === 'qty' ? b.qty : b[sortKey].toLowerCase();
+      return av < bv ? -sortDir : av > bv ? sortDir : 0;
+    });
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * pageSize;
+  const pageItems = filtered.slice(start, start + pageSize);
+
+  const tbody = document.getElementById('productTableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (pageItems.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = pageItems.map((p) => {
+      const realIdx = products.indexOf(p);
+      const isLow = p.qty <= threshold;
+      return `<tr class="${isLow ? 'low-stock' : ''} row-new">
+        <td class="sku-cell">${escHtml(p.sku)}</td>
+        <td class="product-name">${escHtml(p.name)}</td>
+        <td><span class="qty-badge">${p.qty}</span>${isLow ? ' <span title="Low stock" style="color:var(--warning);font-size:12px">⚠️</span>' : ''}</td>
+        <td class="actions-cell">
+          <button class="btn btn-success btn-sm" onclick="openEditModal(${realIdx})">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openConfirm(${realIdx})">🗑️ Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // page info
+  document.getElementById('pageInfo').textContent =
+    `Showing ${start+1}–${Math.min(start + pageSize, filtered.length)} of ${filtered.length} products`;
+
+  // page buttons
+  const btns = document.getElementById('pageBtns');
+  btns.innerHTML = '';
+  const prev = document.createElement('button');
+  prev.className = 'page-btn'; prev.textContent = '‹'; prev.disabled = currentPage === 1;
+  prev.onclick = () => { currentPage--; renderTable(); };
+  btns.appendChild(prev);
+
+  const maxBtns = 5;
+  let pStart = Math.max(1, currentPage - 2);
+  let pEnd = Math.min(totalPages, pStart + maxBtns - 1);
+  if (pEnd - pStart < maxBtns - 1) pStart = Math.max(1, pEnd - maxBtns + 1);
+
+  for (let i = pStart; i <= pEnd; i++) {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    b.textContent = i;
+    const pg = i;
+    b.onclick = () => { currentPage = pg; renderTable(); };
+    btns.appendChild(b);
+  }
+
+  const next = document.createElement('button');
+  next.className = 'page-btn'; next.textContent = '›'; next.disabled = currentPage === totalPages;
+  next.onclick = () => { currentPage++; renderTable(); };
+  btns.appendChild(next);
+}
+
+/* ──────────────────────────────────────────────
+   EDIT MODAL
+────────────────────────────────────────────── */
+function openEditModal(idx) {
+  editingIndex = idx;
+  const p = products[idx];
+  document.getElementById('editSku').value  = p.sku;
+  document.getElementById('editName').value = p.name;
+  document.getElementById('editQty').value  = p.qty;
+  document.getElementById('editModal').classList.add('open');
+  setTimeout(() => document.getElementById('editName').focus(), 120);
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingIndex = -1;
+}
+function saveEdit() {
+  const sku  = document.getElementById('editSku').value.trim();
+  const name = document.getElementById('editName').value.trim();
+  const qty  = parseInt(document.getElementById('editQty').value) || 0;
+  if (!sku || !name) { showToast('SKU and Name are required.', 'error'); return; }
+  const dup = products.findIndex(p => p.sku.toLowerCase() === sku.toLowerCase());
+  if (dup !== -1 && dup !== editingIndex) { showToast('SKU already in use by another product.', 'error'); return; }
+  products[editingIndex] = { sku, name, qty };
+  save(); renderTable(); closeEditModal();
+  showToast(`"${name}" updated.`, 'info');
+}
+
+/* ──────────────────────────────────────────────
+   DELETE CONFIRM
+────────────────────────────────────────────── */
+function openConfirm(idx) {
+  deleteIndex = idx;
+  document.getElementById('confirmProductName').textContent = products[idx].name;
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+  deleteIndex = -1;
+}
+function confirmDelete() {
+  const name = products[deleteIndex].name;
+  products.splice(deleteIndex, 1);
+  save(); renderTable(); closeConfirm();
+  showToast(`"${name}" deleted.`, 'warning');
+}
+
+/* ──────────────────────────────────────────────
+   THEME
+────────────────────────────────────────────── */
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('themeLabel').textContent = next === 'dark' ? 'Dark' : 'Light';
+  localStorage.setItem('otc_theme', next);
+}
+
+/* ──────────────────────────────────────────────
+   THRESHOLD
+────────────────────────────────────────────── */
+function saveThreshold() {
+  threshold = parseInt(document.getElementById('thresholdInput').value) || 0;
+  localStorage.setItem('otc_threshold', threshold);
+  updateStats(); renderTable();
+}
+
+/* ──────────────────────────────────────────────
+   EXPORT CSV
+────────────────────────────────────────────── */
+function exportCSV() {
+  if (products.length === 0) { showToast('No products to export.', 'warning'); return; }
+  const rows = [['SKU', 'Product Name', 'Quantity'], ...products.map(p => [p.sku, p.name, p.qty])];
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  download('OTC_Products_' + dateStamp() + '.csv', csv, 'text/csv');
+  showToast('CSV exported successfully.', 'success');
+}
+
+/* ──────────────────────────────────────────────
+   BACKUP JSON
+────────────────────────────────────────────── */
+function backupJSON() {
+  if (products.length === 0) { showToast('No data to backup.', 'warning'); return; }
+  const data = JSON.stringify({ version: 1, exported: new Date().toISOString(), products }, null, 2);
+  download('OTC_Backup_' + dateStamp() + '.json', data, 'application/json');
+  showToast('Backup downloaded.', 'success');
+}
+
+/* ──────────────────────────────────────────────
+   RESTORE JSON
+────────────────────────────────────────────── */
+function restoreJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const arr = data.products || data;
+      if (!Array.isArray(arr)) throw new Error('Invalid format');
+      if (!confirm(`Restore will REPLACE all current data with ${arr.length} products from backup. Continue?`)) return;
+      products = arr;
+      save(); currentPage = 1; renderTable();
+      showToast(`Restored ${arr.length} products.`, 'success');
+    } catch {
+      showToast('Invalid backup file.', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ──────────────────────────────────────────────
+   HELPERS
+────────────────────────────────────────────── */
+function download(filename, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function dateStamp() {
+  return new Date().toISOString().slice(0,10).replace(/-/g,'');
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ──────────────────────────────────────────────
+   TOAST
+────────────────────────────────────────────── */
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-dot"></span>${msg}`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('out');
+    setTimeout(() => t.remove(), 350);
+  }, 3200);
+}
+
+/* ──────────────────────────────────────────────
+   KEYBOARD SHORTCUTS
+────────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeEditModal(); closeConfirm(); }
+  if (e.key === 'Enter' && document.getElementById('editModal').classList.contains('open')) saveEdit();
+  if (e.key === 'Enter' && !document.getElementById('editModal').classList.contains('open')) {
+    const active = document.activeElement;
+    if (['newSku','newName','newQty'].includes(active?.id)) addProduct();
+  }
+});
+
+/* ──────────────────────────────────────────────
+   CLICK OUTSIDE MODAL
+────────────────────────────────────────────── */
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+
+/* ──────────────────────────────────────────────
+   ENTER KEY: move fields
+────────────────────────────────────────────── */
+['newSku','newName','newQty'].forEach((id, i, arr) => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (i < arr.length - 1) document.getElementById(arr[i+1]).focus();
+      else addProduct();
+    }
+  });
+});
+
+init();
+</script>
+</body>
+</html>
